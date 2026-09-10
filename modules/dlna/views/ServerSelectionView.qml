@@ -81,7 +81,7 @@ FocusScope {
             width: serverList.width
             height: root.sh * 0.0833333
             color: ListView.isCurrentItem ? root.accentColor : "transparent"
-            radius: 4
+            radius: root.sh * 0.0083333
 
             Text {
                 text: view.pinMark(modelData.udn) + (modelData.name || "DLNA Server")
@@ -154,7 +154,7 @@ FocusScope {
         moduleRoot.folderStack = []
         moduleRoot.currentContainerId = "0"
         moduleRoot.currentFolder = server.name
-        moduleRoot.rootShortcutDone = false
+        moduleRoot.categorySkipped = false
         moduleRoot.pinResolved = false
         view.navigateTo("BrowseView.qml", { server: server }, { currentIndex: serverList.currentIndex })
     }
@@ -211,6 +211,9 @@ FocusScope {
 
     Component.onCompleted: {
         refreshServers()
+        if (navListState.currentIndex !== undefined && moduleRoot.servers.length > 0)
+            serverList.currentIndex = Math.min(navListState.currentIndex,
+                                               moduleRoot.servers.length - 1)
         if (moduleRoot.servers.length > 0)
             view.status = `${moduleRoot.servers.length} server(s)`
         dlnaBackend.startDiscovery()

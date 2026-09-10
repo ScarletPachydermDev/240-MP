@@ -11,19 +11,6 @@
       "default": "OFF"
     },
     {
-      "key": "root_shortcut",
-      "label": "Open Server At",
-      "type": "list_single",
-      "options": [
-        "Category List",
-        "Browse Folders",
-        "Video",
-        "Music",
-        "Pictures"
-      ],
-      "default": "Category List"
-    },
-    {
       "key": "audio_lang",
       "label": "Audio Language",
       "type": "list_single",

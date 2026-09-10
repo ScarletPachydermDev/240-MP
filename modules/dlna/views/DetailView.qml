@@ -97,7 +97,7 @@ FocusScope {
         width: root.sw * 0.5
         height: root.sh * 0.0833333
         color: root.accentColor
-        radius: 4
+        radius: root.sh * 0.0083333
 
         anchors.bottom: parent.bottom
         anchors.left: parent.left

@@ -25,7 +25,7 @@ FocusScope {
     property var    folderStack: []
     property string currentContainerId: "0"
     property string currentFolder: ""
-    property bool   rootShortcutDone: false
+    property bool   categorySkipped: false
     property bool   pinResolved: false
     property var currentItems: []
 
@@ -98,7 +98,7 @@ FocusScope {
             folderStack = []
             currentContainerId = navParams.objectId || "0"
             currentFolder = navParams.title || navParams.serverName || ""
-            rootShortcutDone = true
+            categorySkipped = true
             pinResolved = false
             navigateTo("BrowseView.qml", {
                 pinned: true,

@@ -47,10 +47,11 @@ FocusScope {
 
     // The trail and current position are kept on moduleRoot, because opening
     // DetailView unloads this view and it is rebuilt from its original params.
-    property int restoreIndex: -1
+    // Seeded from navListState so returning from the detail view lands on the
+    // row you left, per the navigateTo/goBack contract in CONTRIBUTING.md.
+    property int restoreIndex: navListState.currentIndex !== undefined
+                               ? navListState.currentIndex : -1
 
-    // Copy-then-reassign rather than mutating in place: a QML var property does
-    // not reliably persist an in-place push.
     // Copy-then-reassign rather than mutating in place: a QML var property
     // does not reliably persist an in-place push.
     function enterContainer(id, title) {
@@ -215,29 +216,26 @@ FocusScope {
         }
     }
 
-    // "Open Server At" can skip the server's top-level category list and drop
-    // straight into one of them. Fires only on the first load of this view, so
-    // a later browse back to the root can't bounce the user forward again.
+    // A server's top level is usually Browse Folders / Music / Pictures / Video.
+    // The folder tree already contains all of it, so the category list costs a
+    // step without adding reach — open it directly. Fires only on the first load
+    // of this view, so browsing back to the root cannot bounce the user forward.
     // Returns true when it has taken over, meaning the caller must not render.
-    function takeRootShortcut(items) {
-        if (moduleRoot.rootShortcutDone)
+    function openFolderView(items) {
+        if (moduleRoot.categorySkipped)
             return false
-        moduleRoot.rootShortcutDone = true
+        moduleRoot.categorySkipped = true
 
-        var want = appCore.get_setting(moduleRoot.moduleId, "root_shortcut")
-        if (!want || want === "Category List")
-            return false
-
-        want = String(want).toLowerCase()
         for (var i = 0; i < items.length; i++) {
-            if (items[i].isContainer && String(items[i].title).toLowerCase() === want) {
+            if (items[i].isContainer
+                && String(items[i].title).toLowerCase() === "browse folders") {
                 moduleRoot.currentContainerId = items[i].id
                 moduleRoot.currentFolder = items[i].title
                 dlnaBackend.browseContainer(items[i].id)
                 return true
             }
         }
-        return false   // no match on this server — show the category list
+        return false   // server exposes no folder view — show what it does have
     }
 
     // Only folders can be pinned — a pinned row opens a browse location, and a
@@ -289,7 +287,7 @@ FocusScope {
 
             // Decided before the model is touched: populating first and then
             // jumping would render the category list for a frame.
-            if (takeRootShortcut(items))
+            if (openFolderView(items))
                 return
 
             rows = items
